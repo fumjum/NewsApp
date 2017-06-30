@@ -9,17 +9,15 @@ public class NewsItem {
     public String title;
     public String description;
     public String articleUrl;
-    public String imageUrl;
     public String datePublished;
 
     public NewsItem(){}
 
-    public NewsItem(String author, String title, String description, String articleUrl, String imageUrl, String datePublished){
+    public NewsItem(String author, String title, String description, String articleUrl, String datePublished){
         this.author = author;
         this.title = title;
         this.description = description;
         this.articleUrl = articleUrl;
-        this.imageUrl = imageUrl;
         this.datePublished = datePublished;
     }
 
@@ -53,14 +51,6 @@ public class NewsItem {
 
     public void setArticleUrl(String articleUrl) {
         this.articleUrl = articleUrl;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
     }
 
     public String getDatePublished() {
