@@ -1,8 +1,12 @@
 package com.example.fumju.newsapp;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,14 +15,18 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import org.json.JSONException;
+
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NewsAdapter.NewsAdapterOnClickHandler{
 
     static final String TAG = "mainactivty";
     private ProgressBar progress;
-    private TextView newsTextView;
+    private RecyclerView newsRecyclerView;
+    private NewsAdapter adapter;
 
 
     @Override
@@ -27,7 +35,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         progress = (ProgressBar) findViewById(R.id.progressBar);
-        newsTextView = (TextView) findViewById(R.id.news_data);
+        newsRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        adapter = new NewsAdapter(this);
+
+        newsRecyclerView.setAdapter(adapter);
+        newsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
     @Override
@@ -49,28 +61,42 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+        @Override
+        public void onItemClick(NewsItem newsItem){
+            Uri webpage = Uri.parse(newsItem.getArticleUrl());
+            Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
 
-    public class NewsRequests extends AsyncTask<URL, Void, String> {
+            if(intent.resolveActivity(getPackageManager()) != null){
+                startActivity(intent);
+            }
+        }
 
-        String query;
+
+    public class NewsRequests extends AsyncTask<URL, Void, ArrayList<NewsItem>> {
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            newsTextView.setText("");
+            newsRecyclerView.setVisibility(View.INVISIBLE);
             progress.setVisibility(View.VISIBLE);
 
         }
+
         @Override
-        protected String doInBackground(URL... params){
+        protected ArrayList<NewsItem> doInBackground(URL... params) {
 
+            ArrayList<NewsItem> result = null;
             URL url = params[0];
-            String result = null;
 
-            try{
-                result = NetworkUtils.getResponseFromHttpUrl(url);
+            Log.d(TAG, "url: " + url.toString());
 
-            } catch (IOException e){
+            try {
+                String json = NetworkUtils.getResponseFromHttpUrl(url);
+                result = NetworkUtils.parseJSON(json);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
 
@@ -78,10 +104,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
+        protected void onPostExecute(ArrayList<NewsItem> data) {
+            super.onPostExecute(data);
+            newsRecyclerView.setVisibility(View.VISIBLE);
             progress.setVisibility(View.GONE);
-            newsTextView.setText(s);
-            }
+            adapter.setNewsItems(data);
         }
+    }
     }

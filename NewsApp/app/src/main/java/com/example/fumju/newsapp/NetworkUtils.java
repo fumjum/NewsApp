@@ -1,12 +1,18 @@
 package com.example.fumju.newsapp;
 
 import android.net.Uri;
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -18,7 +24,9 @@ public class NetworkUtils {
     public static final String PARAM_QUERY = "source";
     public static final String PARAM_SORT = "sortBy";
     public static final String PARAM_KEY = "apiKey";
-    public static final String KEY = "KEY DELETED FOR GITHUB";
+    public static final String KEY = "d6ea471fcbdd494991394bb87530c043";
+
+    public static final String TAG = "NetworkUtils";
 
     public static URL makeURL(){
         Uri uri = Uri.parse(NEWSAPI_BASE_URL).buildUpon()
@@ -29,6 +37,7 @@ public class NetworkUtils {
         URL url = null;
         try{
             url = new URL(uri.toString());
+            Log.d(TAG, "Url: " + url);
         }catch(MalformedURLException e){
             e.printStackTrace();
         }
@@ -54,5 +63,25 @@ public class NetworkUtils {
         }finally{
             urlConnection.disconnect();
         }
+    }
+
+    public static ArrayList<NewsItem> parseJSON(String json) throws JSONException {
+        ArrayList<NewsItem> result = new ArrayList<>();
+        JSONObject main = new JSONObject(json);
+        JSONArray items = main.getJSONArray("articles");
+
+        for(int i = 0; i < items.length(); i++){
+            JSONObject article = items.getJSONObject(i);
+           // JSONObject article = item.getJSONObject("articles");
+            String author = article.getString("author");
+            String title = article.getString("title");
+            String description = article.getString("description");
+            String articleUrl = article.getString("url");
+            String imageUrl = article.getString("urlToImage");
+            String datePublished = article.getString("publishedAt");
+            NewsItem news = new NewsItem(author, title, description, articleUrl, imageUrl, datePublished);
+            result.add(news);
+        }
+        return result;
     }
 }
