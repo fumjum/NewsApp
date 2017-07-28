@@ -3,6 +3,8 @@ package com.example.fumju.newsapp;
 import android.net.Uri;
 import android.util.Log;
 
+import com.example.fumju.newsapp.Data.Article;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -65,10 +67,12 @@ public class NetworkUtils {
         }
     }
 
-    public static ArrayList<NewsItem> parseJSON(String json) throws JSONException {
-        ArrayList<NewsItem> result = new ArrayList<>();
+    //In this method I added the Image Url from the api
+    public static ArrayList<Article> parseJSON(String json) throws JSONException {
+        ArrayList<Article> result = new ArrayList<>();
         JSONObject main = new JSONObject(json);
         JSONArray items = main.getJSONArray("articles");
+        //String imgURL = null;
 
         for(int i = 0; i < items.length(); i++){
             JSONObject article = items.getJSONObject(i);
@@ -77,9 +81,11 @@ public class NetworkUtils {
             String description = article.getString("description");
             String articleUrl = article.getString("url");
             String datePublished = article.getString("publishedAt");
-            NewsItem news = new NewsItem(author, title, description, articleUrl, datePublished);
-            result.add(news);
+            String imgURL = article.getString("urlToImage");
+
+            result.add(new Article(author, title, description, articleUrl, datePublished, imgURL));
         }
+        Log.d(TAG, "final articles size: " + result.size());
         return result;
     }
 }

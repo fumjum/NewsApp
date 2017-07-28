@@ -1,11 +1,14 @@
-package com.example.fumju.newsapp;
+package com.example.fumju.newsapp.Data;
 
 /**
- * Created by fumju on 6/28/2017.
+ * Created by fumju on 7/28/2017.
  */
 
-//THIS CLASS WAS MOVED TO ARTICLE IN DATA PACKAGE BUT WAS KEPT HERE IN CASE
-public class NewsItem {
+//This is the object for articles
+//was originally NewsItems before the database was added
+//Added imageUrl
+public class Article {
+
     public String author;
     public String title;
     public String description;
@@ -13,9 +16,9 @@ public class NewsItem {
     public String datePublished;
     public String imageURL;
 
-    public NewsItem(){}
+    public Article(){}
 
-    public NewsItem(String author, String title, String description, String articleUrl, String datePublished, String imageURL){
+    public Article(String author, String title, String description, String articleUrl, String datePublished, String imageURL){
         this.author = author;
         this.title = title;
         this.description = description;
